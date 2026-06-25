@@ -2,9 +2,17 @@
 
 import { useState } from "react";
 
+type Citation = {
+  section: string;
+  title: string;
+  page?: number | null;
+  snippet: string;
+};
+
 type Message = {
   role: "user" | "assistant";
   content: string;
+  citations?: Citation[];
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
@@ -13,6 +21,11 @@ export default function Home() {
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+
+  function startNewChat() {
+    setMessages([]);
+    setQuestion("");
+  }
 
   async function askQuestion() {
     if (!question.trim() || loading) return;
@@ -48,6 +61,7 @@ export default function Home() {
         {
           role: "assistant",
           content: data.answer,
+          citations: data.citations ?? [],
         },
       ]);
     } catch (error) {
@@ -77,13 +91,16 @@ export default function Home() {
       <div className="flex h-screen">
         <aside className="hidden w-72 border-r border-zinc-800 bg-[#080b10] p-5 md:block">
           <div className="mb-8">
-            <h1 className="text-xl font-bold">Transport Spec AI</h1>
+            <h1 className="text-xl font-bold">Transport Spec RAG AI</h1>
             <p className="mt-2 text-sm text-zinc-400">
               Local RAG assistant for engineering standards.
             </p>
           </div>
 
-          <button className="w-full rounded-xl border border-zinc-700 px-4 py-3 text-left text-sm hover:bg-zinc-900">
+          <button
+            onClick={startNewChat}
+            className="w-full rounded-xl border border-zinc-700 px-4 py-3 text-left text-sm hover:bg-zinc-900"
+          >
             + New Chat
           </button>
 
@@ -167,6 +184,33 @@ export default function Home() {
                     }`}
                   >
                     {message.content}
+
+                    {message.role === "assistant" &&
+                      message.citations &&
+                      message.citations.length > 0 && (
+                        <div className="mt-4 border-t border-zinc-700 pt-4">
+                          <p className="mb-2 text-xs uppercase tracking-widest text-zinc-500">
+                            Sources
+                          </p>
+                          <div className="space-y-2">
+                            {message.citations.map((citation, citationIndex) => (
+                              <div
+                                key={citationIndex}
+                                className="rounded-lg bg-zinc-950/70 p-3 text-xs text-zinc-300"
+                              >
+                                <p className="font-medium text-zinc-100">
+                                  Section {citation.section}
+                                  {citation.title ? ` — ${citation.title}` : ""}
+                                  {citation.page ? ` (p. ${citation.page})` : ""}
+                                </p>
+                                <p className="mt-1 text-zinc-400">
+                                  {citation.snippet}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                   </div>
                 </div>
               ))}

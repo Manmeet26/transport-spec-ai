@@ -8,7 +8,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 PDF_PATH = BASE_DIR / "data" / "specs.pdf"
-
+CHUNKS_PATH = BASE_DIR / "data" / "chunks.json"
+BM25_PATH = BASE_DIR / "data" / "bm25.pkl"
 QDRANT_PATH = BASE_DIR / "qdrant_storage"
 
 

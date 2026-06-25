@@ -180,18 +180,12 @@ for page_num, page in tqdm(
 # SAVE CHUNKS
 # -----------------------------
 
-with open(
-    "chunks.json",
-    "w"
-) as f:
+CHUNKS_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-    json.dump(
-        all_chunks,
-        f,
-        indent=2
-    )
+with open(CHUNKS_PATH, "w") as f:
+    json.dump(all_chunks, f, indent=2)
 
-print("\nSaved chunks.json\n")
+print(f"\nSaved chunks to {CHUNKS_PATH}\n")
 
 
 # -----------------------------
